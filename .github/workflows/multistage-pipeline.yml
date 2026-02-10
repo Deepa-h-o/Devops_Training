@@ -25,11 +25,18 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to Development
+      - name: Checkout other repo (for scripts)
+        uses: actions/checkout@v4
+        with:
+          # replace with the GitHub owner/repo where you pushed `other-repo`
+          repository: your-user/other-repo
+          path: other-repo
+          # For private repos, set a Personal Access Token with `repo` scope in secrets
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      - name: Run script from other repo
         run: |
-          echo "✅ Deploying to Development..."
-          echo "Build Status: SUCCESS ✓"
-          echo "Timestamp: $(date)"
+          chmod +x other-repo/scripts/hello.sh || true
+          bash other-repo/scripts/hello.sh dev-arg
 
   # STAGING STAGE - DEPENDS ON DEV
   deploy-staging:
@@ -38,11 +45,21 @@ jobs:
     needs: deploy-dev
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout other repo (for scripts)
+        uses: actions/checkout@v4
+        with:
+          repository: your-user/other-repo
+          path: other-repo
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Run Tests
         run: |
           echo "🧪 Running tests on staging..."
           echo "Dev Status: SUCCESS ✓"
           echo "Checking file integrity..."
+      - name: Run script from other repo
+        run: |
+          chmod +x other-repo/scripts/hello.sh || true
+          bash other-repo/scripts/hello.sh staging-arg
       - name: Deploy to Staging
         run: |
           echo "✅ Deploying to Staging..."
@@ -57,11 +74,21 @@ jobs:
       name: production
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout other repo (for scripts)
+        uses: actions/checkout@v4
+        with:
+          repository: your-user/other-repo
+          path: other-repo
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Pre-deploy Checks
         run: |
           echo "🔍 Running pre-deployment checks..."
           echo "Staging Status: SUCCESS ✓"
           echo "Verifying all files..."
+      - name: Run script from other repo
+        run: |
+          chmod +x other-repo/scripts/hello.sh || true
+          bash other-repo/scripts/hello.sh prod-arg
       - name: Deploy to Production
         run: |
           echo "✅ Deploying to Production..."
