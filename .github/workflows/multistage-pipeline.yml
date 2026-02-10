@@ -28,10 +28,8 @@ jobs:
       - name: Checkout other repo (for scripts)
         uses: actions/checkout@v4
         with:
-          # replace with the GitHub owner/repo where you pushed `other-repo`
-          repository: your-user/other-repo
+          repository: Deepa-h-o/other-repo
           path: other-repo
-          # For private repos, set a Personal Access Token with `repo` scope in secrets
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Run script from other repo
         run: |
@@ -48,7 +46,7 @@ jobs:
       - name: Checkout other repo (for scripts)
         uses: actions/checkout@v4
         with:
-          repository: your-user/other-repo
+          repository: Deepa-h-o/other-repo
           path: other-repo
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Run Tests
@@ -77,7 +75,7 @@ jobs:
       - name: Checkout other repo (for scripts)
         uses: actions/checkout@v4
         with:
-          repository: your-user/other-repo
+          repository: Deepa-h-o/other-repo
           path: other-repo
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Pre-deploy Checks
