@@ -1,0 +1,59 @@
+name: Simple Multistage Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - develop
+
+jobs:
+  # DEVELOPMENT STAGE
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Development
+        run: |
+          echo "✅ Deploying to Development..."
+          echo "Branch: develop"
+          echo "Timestamp: $(date)"
+
+  # STAGING STAGE
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Tests
+        run: |
+          echo "🧪 Running tests on staging..."
+          echo "Checking file integrity..."
+      - name: Deploy to Staging
+        run: |
+          echo "✅ Deploying to Staging..."
+          echo "Branch: staging"
+          echo "Timestamp: $(date)"
+
+  # PRODUCTION STAGE
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pre-deploy Checks
+        run: |
+          echo "🔍 Running pre-deployment checks..."
+          echo "Verifying all files..."
+      - name: Deploy to Production
+        run: |
+          echo "✅ Deploying to Production..."
+          echo "Branch: main"
+          echo "Timestamp: $(date)"
+          echo "Manual approval required for production"
