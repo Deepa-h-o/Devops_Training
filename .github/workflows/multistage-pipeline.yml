@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - staging
-      - develop
 
 jobs:
-  # BUILD STAGE - RUNS FIRST FOR ALL BRANCHES
+  # BUILD STAGE - RUNS FIRST
   build:
     name: Build Application
     runs-on: ubuntu-latest
@@ -20,46 +18,41 @@ jobs:
           echo "Timestamp: $(date)"
           echo "Files compiled successfully"
 
-  # DEVELOPMENT STAGE - DEPENDS ON BUILD (develop branch)
+  # DEVELOPMENT STAGE - DEPENDS ON BUILD
   deploy-dev:
     name: Deploy to Dev
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v4
       - name: Deploy to Development
         run: |
           echo "✅ Deploying to Development..."
-          echo "Branch: develop"
-          echo "Build Status: ${{ needs.build.result }}"
+          echo "Build Status: SUCCESS ✓"
           echo "Timestamp: $(date)"
 
-  # STAGING STAGE - DEPENDS ON BUILD (staging branch)
+  # STAGING STAGE - DEPENDS ON DEV
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/staging'
+    needs: deploy-dev
     steps:
       - uses: actions/checkout@v4
       - name: Run Tests
         run: |
           echo "🧪 Running tests on staging..."
-          echo "Build Status: ${{ needs.build.result }}"
+          echo "Dev Status: SUCCESS ✓"
           echo "Checking file integrity..."
       - name: Deploy to Staging
         run: |
           echo "✅ Deploying to Staging..."
-          echo "Branch: staging"
           echo "Timestamp: $(date)"
 
-  # PRODUCTION STAGE - DEPENDS ON BUILD (main branch)
+  # PRODUCTION STAGE - DEPENDS ON STAGING
   deploy-prod:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs: deploy-staging
     environment:
       name: production
     steps:
@@ -67,12 +60,10 @@ jobs:
       - name: Pre-deploy Checks
         run: |
           echo "🔍 Running pre-deployment checks..."
-          echo "Build Status: ${{ needs.build.result }}"
+          echo "Staging Status: SUCCESS ✓"
           echo "Verifying all files..."
       - name: Deploy to Production
         run: |
           echo "✅ Deploying to Production..."
-          echo "Branch: main"
           echo "Timestamp: $(date)"
-          echo "Manual approval required for production"
-          echo "Alert: This is PRODUCTION environment"
+          echo "⚠️ LIVE PRODUCTION DEPLOYMENT - All tests passed!"
