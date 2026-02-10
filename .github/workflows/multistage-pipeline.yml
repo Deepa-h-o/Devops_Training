@@ -20,7 +20,7 @@ jobs:
           echo "Timestamp: $(date)"
           echo "Files compiled successfully"
 
-  # DEVELOPMENT STAGE - DEPENDS ON BUILD
+  # DEVELOPMENT STAGE - DEPENDS ON BUILD (develop branch)
   deploy-dev:
     name: Deploy to Dev
     runs-on: ubuntu-latest
@@ -35,18 +35,18 @@ jobs:
           echo "Build Status: ${{ needs.build.result }}"
           echo "Timestamp: $(date)"
 
-  # STAGING STAGE - DEPENDS ON BUILD & DEV
+  # STAGING STAGE - DEPENDS ON BUILD (staging branch)
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [build, deploy-dev]
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+    needs: build
+    if: github.ref == 'refs/heads/staging'
     steps:
       - uses: actions/checkout@v4
       - name: Run Tests
         run: |
           echo "🧪 Running tests on staging..."
-          echo "Dev Status: ${{ needs.deploy-dev.result }}"
+          echo "Build Status: ${{ needs.build.result }}"
           echo "Checking file integrity..."
       - name: Deploy to Staging
         run: |
@@ -54,11 +54,11 @@ jobs:
           echo "Branch: staging"
           echo "Timestamp: $(date)"
 
-  # PRODUCTION STAGE - DEPENDS ON STAGING
+  # PRODUCTION STAGE - DEPENDS ON BUILD (main branch)
   deploy-prod:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build, deploy-staging]
+    needs: build
     if: github.ref == 'refs/heads/main'
     environment:
       name: production
@@ -67,7 +67,7 @@ jobs:
       - name: Pre-deploy Checks
         run: |
           echo "🔍 Running pre-deployment checks..."
-          echo "Staging Status: ${{ needs.deploy-staging.result }}"
+          echo "Build Status: ${{ needs.build.result }}"
           echo "Verifying all files..."
       - name: Deploy to Production
         run: |
